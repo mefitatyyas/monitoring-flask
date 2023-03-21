@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, jsonify, Request
 from flask_mysqldb import MySQL
 import paho.mqtt.client as mqtt
 from datetime import datetime
+import json
 
 # Config
 app = Flask(__name__)
@@ -24,9 +25,23 @@ def dashboard():
     data = cur.fetchall()
     cur2 = mysql.connection.cursor()
     cur2.execute('SELECT * FROM suhu ORDER BY id DESC LIMIT 1')
-    temp = cur2.fetchone()     
+    temp = cur2.fetchone()
     return render_template('dashboard.html',data=data,temp=temp)
-        
+
+@app.route('/json-chart', methods=['GET'])
+def x_chart():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM suhujam")
+    r = [dict((cur.description[i][0], value)
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+    return jsonify({'data' : r})
+    # chart_data = jsonify({'myCollection' : r})
+    # return render_template('xchart.html'),jsonify({'myCollection' : r})
+
+@app.route('/example', methods=['GET']) 
+def example():
+    return render_template('example.html')
+
 @app.route('/dashgenset', methods=['GET'])
 def dashboardgenset(): 
     cur = mysql.connection.cursor()
@@ -42,9 +57,9 @@ def dashboardgenset():
 def insert(temp,hum,getstatus):
     temp = float(temp)
     hum = float(hum)
-    getstatus = str(getstatus)
+    getstatus = int(getstatus)
     cur = mysql.connection.cursor()
-    cur.execute(f"INSERT INTO suhu (temp, hum, status) VALUES ({temp}, {hum}, '{getstatus}')")
+    cur.execute(f"INSERT INTO suhu (tanggal,temp, hum, status) VALUES (UTC_TIMESTAMP(),{temp}, {hum}, '{getstatus}')")
     mysql.connection.commit()
     cur.close()
     return 'Data berhasil ditambahkan'

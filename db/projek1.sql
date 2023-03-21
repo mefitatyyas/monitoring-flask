@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.0.4
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 20, 2023 at 08:05 AM
--- Server version: 10.4.25-MariaDB
--- PHP Version: 8.1.10
+-- Generation Time: Mar 21, 2023 at 05:15 AM
+-- Server version: 10.4.16-MariaDB
+-- PHP Version: 7.4.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -180,6 +180,29 @@ INSERT INTO `suhu` (`id`, `tanggal`, `temp`, `hum`, `status`) VALUES
 (139, '2023-03-17 14:22:00', 27.1, 58.5, 'Tidak Aman'),
 (140, '2023-03-17 14:22:05', 27.1, 58.5, 'Tidak Aman'),
 (141, '2023-03-17 14:22:10', 27.1, 58.4, 'Tidak Aman');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `suhujam`
+--
+
+CREATE TABLE `suhujam` (
+  `id` int(11) NOT NULL,
+  `tanggal` date NOT NULL,
+  `waktu` time NOT NULL,
+  `temp` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `suhujam`
+--
+
+INSERT INTO `suhujam` (`id`, `tanggal`, `waktu`, `temp`) VALUES
+(1, '2023-03-20', '16:00:00', 20),
+(2, '2023-03-20', '17:00:00', 25),
+(3, '2023-03-20', '18:00:00', 30),
+(4, '2023-03-20', '19:00:00', 35);
 
 -- --------------------------------------------------------
 
@@ -557,6 +580,12 @@ ALTER TABLE `suhu`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `suhujam`
+--
+ALTER TABLE `suhujam`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `tbdata`
 --
 ALTER TABLE `tbdata`
@@ -583,6 +612,12 @@ ALTER TABLE `genset`
 --
 ALTER TABLE `suhu`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
+
+--
+-- AUTO_INCREMENT for table `suhujam`
+--
+ALTER TABLE `suhujam`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tbdata`

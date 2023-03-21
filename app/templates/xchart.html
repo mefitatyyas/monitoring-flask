@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+    <canvas id="canvas"></canvas>
+    {{chart_data}}
+    <script>
+      let ojson = "{{chart_data}}";
+      ojson = ojson.replace(/'/g, '"');
+      ojson = JSON.parse(ojson);
+      console.log(ojson["name"]);
+    </script>
+    <script>
+      var jsonfile = [
+        { x: 0, y: 87 },
+        { x: 1, y: 91 },
+        { x: 2, y: 87 },
+        { x: 3, y: 92 },
+        { x: 4, y: 96 },
+        { x: 5, y: 91 },
+        { x: 6, y: 93 },
+        { x: 7, y: 88 },
+        { x: 8, y: 95 },
+        { x: 9, y: 91 },
+        { x: 10, y: 94 },
+        { x: 11, y: 88 },
+        { x: 12, y: 92 },
+        { x: 13, y: 92 },
+        { x: 14, y: 91 },
+        { x: 15, y: 90 },
+        { x: 16, y: 92 },
+        { x: 17, y: 89 },
+        { x: 18, y: 93 },
+        { x: 19, y: 89 },
+        { x: 20, y: 89 },
+        { x: 21, y: 93 },
+        { x: 22, y: 92 },
+        { x: 23, y: 93 },
+        { x: 24, y: 88 },
+        { x: 25, y: 89 },
+        { x: 26, y: 95 },
+      ];
+
+      var labels = jsonfile.map(function (e) {
+        return e.x;
+      });
+      var data = jsonfile.map(function (e) {
+        return e.y;
+      });
+
+      var ctx = canvas.getContext("2d");
+      var config = {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: "Analog Mérés",
+              data: data,
+              backgroundColor: "rgba(0, 119, 204, 0.3)",
+            },
+          ],
+        },
+      };
+
+      var chart = new Chart(ctx, config);
+    </script>
+  </body>
+</html>
