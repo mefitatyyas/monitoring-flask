@@ -1,8 +1,6 @@
 from flask import Flask, render_template, jsonify, Request
 from flask_mysqldb import MySQL
-import paho.mqtt.client as mqtt
-from datetime import datetime
-import json
+import paho.mqtt.client as mqtt_client
 
 # Config
 app = Flask(__name__)
@@ -65,6 +63,26 @@ def insert(temp,hum,getstatus):
     return 'Data berhasil ditambahkan'
 
 
+@app.route('/dashgenset', methods=['GET'])
+def dashboardgenset(): 
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM voltage')
+    gen = cur.fetchall()
+    cur2 = mysql.connection.cursor()
+    cur2.execute('SELECT * FROM voltage ORDER BY idvolt DESC LIMIT 1')
+    volt = cur2.fetchone()    
+    return render_template('dashboardgenset.html', gen=gen,volt=volt)
+
+@app.route('/dashgenset2', methods=['GET'])
+def dashboardgenset2(): 
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM voltage1')
+    gen = cur.fetchall()
+    cur2 = mysql.connection.cursor()
+    cur2.execute('SELECT * FROM voltage1 ORDER BY idvolt1 DESC LIMIT 1')
+    volt = cur2.fetchone()    
+    return render_template('dashgenset2.html', gen=gen,volt=volt)
+
 @app.route('/genset/kamera', methods=['POST'])
 def genset():
     data = request.form['img']
@@ -72,6 +90,32 @@ def genset():
     cur.execute(f"INSERT INTO `genset` (`id_data`, `gambar`) VALUES (NULL, '{data}')")
     mysql.connection.commit()
     cur.close()
+    return 'Data Berhasil Ditambahkan'
+
+@app.route('/genset/camera', methods=['POST'])
+def genset1():
+    data = request.form['img']
+    cur = mysql.connection.cursor()
+    cur.execute(f"INSERT INTO `genset1` (`id_data1`, `picture`) VALUES (NULL, '{data}')")
+    mysql.connection.commit()
+    cur.close()
+    return 'Data Berhasil Ditambahkan'
+
+# link untuj
+@app.route('/genset/camera/get')
+def getFromCam():
+    client = mqtt_client.Client("bmkguser123")
+    client.connect('broker.emqx.io', 1883)
+
+    client.publish("bmkg/ambilcamera", "?ambilfoto")
+    return 'Data Berhasil Ditambahkan'
+
+@app.route('/genset/camera/flash/<value>')
+def getFlashCam(value):
+    client = mqtt_client.Client("bmkguser123")
+    client.connect('broker.emqx.io', 1883)
+
+    client.publish("bmkg/ambilcamera", f"?flash={value}")
     return 'Data Berhasil Ditambahkan'
 
 @app.route('/genset/volt', methods=['POST'])
@@ -83,6 +127,17 @@ def gensetV():
     mysql.connection.commit()
     cur.close()
     return 'Data Berhasil Ditambahkan'
+
+@app.route('/genset/voltage1', methods=['POST'])
+def gensetV1():
+    data = request.form['volt']
+    bv,sv,lv,c,p = data.split(',')
+    cur = mysql.connection.cursor()
+    cur.execute(f"INSERT INTO `voltage1` (`idvolt1`,`BV`, `SV`, `LV`, `C`, `P`) VALUES (NULL, '{bv}', '{sv}', '{lv}', '{c}', '{p}')")
+    mysql.connection.commit()
+    cur.close()
+    return 'Data Berhasil Ditambahkan'
+
 
 
 if __name__ == '__main__':
