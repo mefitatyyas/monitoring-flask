@@ -31,7 +31,7 @@
     <link href="/static/assets/css/style.css" rel="stylesheet">
 
     <!-- Custom styles for this page -->
-    <link href="/static/assets/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="/static/assets/lib/dataTables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -149,17 +149,18 @@
 
 
             <!-- Data table Start -->
-            <div class="container-fluid">
-                <!-- DataTales Example -->
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Data Tables Sensor</h6>
-                                                </div>
-                    <div class="card-body">
+            <div class="container-fluid pt-4 px-4 pb-4">
+                <!-- DataTales Example  -->
+                <div class="card">
+                    <div class="bg-light text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">SISTEM MONITORING SUHU RUANGAN SERVER</h6>
+                    </div></div>
+                    <div class="card-body bg-light">
                         <div class="table-responsive">
-                            <table id="dataTable" class="display table table-bordered text-center" style="width:100%" >
+                            <table id="dataTable" class="table text-center" style="width:100%" >
                                 <thead class="text-center">
-                                    <tr class="text-dark">
+                                    <tr>
                                         <th scope="col">No</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">Temperature</th>
@@ -174,8 +175,9 @@
                     </div>
                 </div>
             </div>
-        </div>
+        
             <!-- Data table End -->
+            
 
 
             <!-- Footer Start -->
@@ -189,7 +191,7 @@
                 </div>
             </div>
             <!-- Footer End -->
-        </div>
+        
         <!-- Content End -->
 
 
@@ -217,7 +219,6 @@
     </script>
 
     <!--Jquery Ajax Table-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
             // Perbarui data setiap detik
