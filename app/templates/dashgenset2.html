@@ -101,7 +101,7 @@
                             <img src="../static/assets/img/bv.png" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Bus Voltage</p>
-                                <h6 class="mb-0"><span id="bv"></h6>
+                                <h6 class="mb-0"><span id="BV"></h6>
                             </div>
                         </div>
                     </div>
@@ -110,7 +110,7 @@
                             <img src="../static/assets/img/volt.png" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Shunt Voltage</p>
-                                <h6 class="mb-0"><span id="sv"></h6>
+                                <h6 class="mb-0"><span id="SV"></h6>
                             </div>
                         </div>
                     </div>
@@ -119,7 +119,7 @@
                             <img src="../static/assets/img/lv.jfif" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Load Voltage</p>
-                                <h6 class="mb-0"><span id="lv"></h6>
+                                <h6 class="mb-0"><span id="LV"></h6>
                             </div>
                         </div>
                     </div>
@@ -128,7 +128,7 @@
                             <img src="../static/assets/img/c.jpg" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Current</p>
-                                <h6 class="mb-0"><span id="c"></h6>
+                                <h6 class="mb-0"><span id="C"></h6>
                             </div>
                         </div>
                     </div>
@@ -137,7 +137,7 @@
                             <img src="../static/assets/img/power.webp" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Power</p>
-                                <h6 class="mb-0"><span id="p"></h6>
+                                <h6 class="mb-0"><span id="P"></h6>
                             </div>
                         </div>
                     </div>
@@ -174,7 +174,7 @@
                         <a href="">Show All</a>
                     </div>
                     <div class="table-responsive">
-                        <table id="data-table" class="table text-start align-middle table-bordered table-hover mb-0">
+                        <table class="table text-start align-middle table-bordered table-hover mb-0">
                             <thead>
                                 <tr class="text-dark">
                                     <th scope="col">No</th>
@@ -187,6 +187,16 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                    {% for d in gen %}
+                                        <tr>
+                                            <td>{{ d[0] }}</td>
+                                            <td>{{ d[1] }}</td>
+                                            <td>{{ d[2] }}</td>
+                                            <td>{{ d[3] }}</td>
+                                            <td>{{ d[4] }}</td>
+                                            <td>{{ d[5] }}</td>
+                                        </tr>
+                                    {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -221,49 +231,47 @@
             // Perbarui data setiap detik
             setInterval(function() {
                 $.ajax({
-                    url: '/datag',
+                    url: '/datag2',
                     success: function(response) {
-                        var volt = JSON.parse(response);
-                        $('#bv').text(volt.bv);
-                        $('#sv').text(volt.sv);
-                        $('#lv').text(volt.lv);
-                        $('#c').text(volt.c);
-                        $('#p').text(volt.p);
+                        var volt2 = JSON.parse(response);
+                        $('#BV').text(volt2.BV);
+                        $('#SV').text(volt2.SV);
+                        $('#LV').text(volt2.LV);
+                        $('#C').text(volt2.C);
+                        $('#P').text(volt2.P);
                     }
                 });
             }, 1000);
         });
     </script>
 
-    <!--Jquery Ajax Table-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Perbarui data setiap detik
-            setInterval(function() {
-                $.ajax({
-                    url: '/datagen',
-                    success: function(response) {
-                        var data = JSON.parse(response);
-                        $('#data-table tbody').empty();
-                        for (var i = 0; i < data.length; i++) {
-                            var t = $('<tr>');
-                            t.append($('<td>').text(data[i].idvolt));
-                            t.append($('<td>').text(data[i].date));
-                            t.append($('<td>').text(data[i].bv));
-                            t.append($('<td>').text(data[i].sv));
-                            t.append($('<td>').text(data[i].lv));
-                            t.append($('<td>').text(data[i].c));
-                            t.append($('<td>').text(data[i].p));
-                            $('#data-table tbody').append(t);
-                        }
-                    }
-                });
-            }, 1000);
-        });
-    </script>
-
-
+     <!--Jquery Ajax Table-->
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+     <script>
+         $(document).ready(function() {
+             // Perbarui data setiap detik
+             setInterval(function() {
+                 $.ajax({
+                     url: '/datagen2',
+                     success: function(response) {
+                         var data2 = JSON.parse(response);
+                         $('#data-table tbody').empty();
+                         for (var i = 0; i < data2.length; i++) {
+                             var t = $('<tr>');
+                             t.append($('<td>').text(data2[i].idvolt1));
+                             t.append($('<td>').text(data2[i].date));
+                             t.append($('<td>').text(data2[i].BV));
+                             t.append($('<td>').text(data2[i].SV));
+                             t.append($('<td>').text(data2[i].LV));
+                             t.append($('<td>').text(data2[i].C));
+                             t.append($('<td>').text(data2[i].P));
+                             $('#data-table tbody').append(t);
+                         }
+                     }
+                 });
+             }, 1000);
+         });
+     </script>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

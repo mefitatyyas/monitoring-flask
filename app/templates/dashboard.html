@@ -66,7 +66,7 @@
                             <a href="dashgenset" class="dropdown-item">Genset</a>
                         </div>
                     </div>
-                    <a href="about.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>About</a>
+                    <a href="about" class="nav-item nav-link"><i class="fa fa-th me-2"></i>About</a>
                         </div>
                     </div>
                 </div>
@@ -96,30 +96,30 @@
             <!-- Dashboard Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-3">
-                    <div class="col-sm-6 col-xl-3">
+                    <div class="col-sm-6 col-xl-4">
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <img src="../static/assets/img/temp.png" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Temperature</p>
-                                <h6 class="mb-0">{{temp[2]}} &#8451;</h6>
+                                <h6 class="mb-0"><span id="temp"></span> &#8451;</h6>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-xl-3">
+                    <div class="col-sm-6 col-xl-4">
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <img src="../static/assets/img/hum.png" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Humidity</p>
-                                <h6 class="mb-0">{{temp[3]}} &#37;</h6>
+                                <h6 class="mb-0"><span id="hum"></span> &#37;</h6>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-6 col-xl-3">
+                    <div class="col-sm-6 col-xl-4">
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
                             <img src="../static/assets/img/info.png" width="80px">
                             <div class="ms-3">
                                 <p class="mb-2">Status</p>
-                                <h6 class="mb-0">{{temp[4]}}</h6>
+                                <h6 class="mb-0"><span id="getstatus"></span></h6>
                             </div>
                         </div>
                     </div>
@@ -127,31 +127,31 @@
             </div>
             <!-- Dashboard End -->
 
-            <!-- Sales Chart Start -->
+            <!--Temperature & Humidity  Chart Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
-                    
-                    <div class="col-sm-12 col-xl-6">
+                    <div class="col-sm-12 col-xl-12">
                         <div class="bg-light text-center rounded p-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
-                                <h6 class="mb-0">Salse & Revenue</h6>
+                                <h6 class="mb-0">Temperature & Humidity</h6>
                             </div>
                             <canvas id="monitoring-chart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Sales Chart End -->
+            <!-- Temperature & Humidity Chart End -->
+
 
             <!-- Data table Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">SISTEM MONITORING SUHU RUANGAN SERVER</h6>
-                        <a href="">Show All</a>
+
                     </div>
                     <div class="table-responsive">
-                        <table class="table text-start align-middle table-bordered table-hover mb-0">
+                        <table  id="data-table" class="table text-start align-middle table-bordered table-hover mb-0" >
                             <thead>
                                 <tr class="text-dark">
                                     <th scope="col">No</th>
@@ -162,16 +162,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for d in data %}
-                                    <tr>
-                                        <td>{{ d[0] }}</td>
-                                        <td>{{ d[1] }}</td>
-                                        <td>{{ d[2] }}</td>
-                                        <td>{{ d[3] }}</td>
-                                        <td>{{ d[4] }}</td>
-                                        <td>{{ d[5] }}</td>
-                                    </tr>
-                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -199,6 +189,52 @@
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
 
+    <!--Jquery Ajax Dashboard-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Perbarui data setiap detik
+            setInterval(function() {
+                $.ajax({
+                    url: '/data',
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        $('#temp').text(data.temp);
+                        $('#hum').text(data.hum);
+                        $('#getstatus').text(data.getstatus);
+                    }
+                });
+            }, 1000);
+        });
+    </script>
+
+    <!--Jquery Ajax Table-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Perbarui data setiap detik
+            setInterval(function() {
+                $.ajax({
+                    url: '/datat',
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        $('#data-table tbody').empty();
+                        for (var i = 0; i < data.length; i++) {
+                            var t = $('<tr>');
+                            t.append($('<td>').text(data[i].id));
+                            t.append($('<td>').text(data[i].tanggal));
+                            t.append($('<td>').text(data[i].temp));
+                            t.append($('<td>').text(data[i].hum));
+                            t.append($('<td>').text(data[i].status));
+                            $('#data-table tbody').append(t);
+                        }
+                    }
+                });
+            }, 1000);
+        });
+    </script>
+
+
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -221,10 +257,13 @@
         length = data.data.length;
         console.log(length);
         labels = [];
-        values = [];
+        temperature = [];
+        humidity = [];
+
         for (i = 0; i < length; i++) {
             labels.push(data.data[i].tanggal);
-            values.push(data.data[i].temp);
+            temperature.push(data.data[i].temp);
+            humidity.push(data.data[i].hum);
         }
         new Chart($("#monitoring-chart").get(0).getContext("2d"), {
             type: "line",
@@ -232,11 +271,18 @@
                 labels: labels,
                 datasets: [
                     {
-                    label: "Salse",
-                    data: values,
+                    label: "temp",
+                    data: temperature,
+                    backgroundColor: "rgba(255, 0, 0, .8)",
+                    fill: false,
+                    },
+                    {
+                    label: "hum",
+                    data: humidity,
                     backgroundColor: "rgba(0, 156, 255, .5)",
                     fill: false,
                     },
+
                 ],
             },
             options: {
@@ -245,6 +291,8 @@
         });
     }
     </script>
+
+
 </body>
 
 </html>

@@ -29,6 +29,9 @@
 
     <!-- Template Stylesheet -->
     <link href="/static/assets/css/style.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/static/assets/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -95,49 +98,31 @@
 
             <!-- Dashboard Start -->
             <div class="container-fluid pt-4 px-4">
-                <div class="row g-4 justify-content-center">
-                    <div class="col-sm-6 col-xl-6">
+                <div class="row g-3">
+                    <div class="col-sm-6 col-xl-4">
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/bv.png" width="80px">
+                            <img src="../static/assets/img/temp.png" width="80px">
                             <div class="ms-3">
-                                <p class="mb-2">Bus Voltage</p>
-                                <h6 class="mb-0"><span id="bv"></h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-xl-6">
-                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/volt.png" width="80px">
-                            <div class="ms-3">
-                                <p class="mb-2">Shunt Voltage</p>
-                                <h6 class="mb-0"><span id="sv"></h6>
+                                <p class="mb-2">Temperature</p>
+                                <h6 class="mb-0"><span id="temp"></span> &#8451;</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6 col-xl-4">
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/lv.jfif" width="80px">
+                            <img src="../static/assets/img/hum.png" width="80px">
                             <div class="ms-3">
-                                <p class="mb-2">Load Voltage</p>
-                                <h6 class="mb-0"><span id="lv"></h6>
+                                <p class="mb-2">Humidity</p>
+                                <h6 class="mb-0"><span id="hum"></span> &#37;</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6 col-xl-4">
                         <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/c.jpg" width="80px">
+                            <img src="../static/assets/img/info.png" width="80px">
                             <div class="ms-3">
-                                <p class="mb-2">Current</p>
-                                <h6 class="mb-0"><span id="c"></h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-xl-4">
-                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/power.webp" width="80px">
-                            <div class="ms-3">
-                                <p class="mb-2">Power</p>
-                                <h6 class="mb-0"><span id="p"></h6>
+                                <p class="mb-2">Status</p>
+                                <h6 class="mb-0"><span id="getstatus"></span></h6>
                             </div>
                         </div>
                     </div>
@@ -145,53 +130,51 @@
             </div>
             <!-- Dashboard End -->
 
-
-            <!-- Line Chart Start -->
+            <!--Temperature & Humidity  Chart Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
                     <div class="col-sm-12 col-xl-12">
                         <div class="bg-light text-center rounded p-4">
                             <div class="d-flex align-items-center justify-content-between mb-4">
-                                <h6 class="mb-0">Picture</h6>
+                                <h6 class="mb-0">Temperature & Humidity</h6>
                             </div>
-                            <div class="d-flex align-items-center justify-content-center">
-                                <img src={{gambar}} style="height:400px"></img>
-                            </div>
+                            <canvas id="monitoring-chart"></canvas>
+	                        <label for="tanggal">Pilih Tanggal:</label>
+	                    <input type="date" id="tanggal" name="tanggal">
                         </div>
                     </div>
-                    <div class="col-sm-12 col-xl-12">
-                        <button class="btn btn-info form-control">GET IMAGE</button>
                 </div>
             </div>
-            <!-- Line Chart End -->
+            <!-- Temperature & Humidity Chart End -->
 
 
             <!-- Data table Start -->
-            <div class="container-fluid pt-4 px-4">
-                <div class="bg-light text-center rounded p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-4">
-                        <h6 class="mb-0">SISTEM MONITORING POMPA UKUR GENSET</h6>
-                        <a href="">Show All</a>
-                    </div>
-                    <div class="table-responsive">
-                        <table id="data-table" class="table text-start align-middle table-bordered table-hover mb-0">
-                            <thead>
-                                <tr class="text-dark">
-                                    <th scope="col">No</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">BV</th>
-                                    <th scope="col">SV</th>
-                                    <th scope="col">LV</th>
-                                    <th scope="col">C</th>
-                                    <th scope="col">P</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+            <div class="container-fluid">
+                <!-- DataTales Example -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Data Tables Sensor</h6>
+                                                </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="dataTable" class="display table table-bordered text-center" style="width:100%" >
+                                <thead class="text-center">
+                                    <tr class="text-dark">
+                                        <th scope="col">No</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Temperature</th>
+                                        <th scope="col">Humadity</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
             <!-- Data table End -->
 
 
@@ -221,14 +204,12 @@
             // Perbarui data setiap detik
             setInterval(function() {
                 $.ajax({
-                    url: '/datag',
+                    url: '/data',
                     success: function(response) {
-                        var volt = JSON.parse(response);
-                        $('#bv').text(volt.bv);
-                        $('#sv').text(volt.sv);
-                        $('#lv').text(volt.lv);
-                        $('#c').text(volt.c);
-                        $('#p').text(volt.p);
+                        var data = JSON.parse(response);
+                        $('#temp').text(data.temp);
+                        $('#hum').text(data.hum);
+                        $('#getstatus').text(data.getstatus);
                     }
                 });
             }, 1000);
@@ -242,20 +223,18 @@
             // Perbarui data setiap detik
             setInterval(function() {
                 $.ajax({
-                    url: '/datagen',
+                    url: '/datat',
                     success: function(response) {
                         var data = JSON.parse(response);
-                        $('#data-table tbody').empty();
+                        $('#dataTable tbody').empty();
                         for (var i = 0; i < data.length; i++) {
                             var t = $('<tr>');
-                            t.append($('<td>').text(data[i].idvolt));
-                            t.append($('<td>').text(data[i].date));
-                            t.append($('<td>').text(data[i].bv));
-                            t.append($('<td>').text(data[i].sv));
-                            t.append($('<td>').text(data[i].lv));
-                            t.append($('<td>').text(data[i].c));
-                            t.append($('<td>').text(data[i].p));
-                            $('#data-table tbody').append(t);
+                            t.append($('<td>').text(data[i].id));
+                            t.append($('<td>').text(data[i].tanggal));
+                            t.append($('<td>').text(data[i].temp));
+                            t.append($('<td>').text(data[i].hum));
+                            t.append($('<td>').text(data[i].status));
+                            $('#dataTable tbody').append(t);
                         }
                     }
                 });
@@ -263,7 +242,44 @@
         });
     </script>
 
+    <!-- Page level custom scripts -->
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable();
+        });
+    </script>
 
+    <script>
+		// Fungsi untuk menyimpan tanggal ke localStorage
+		function simpanTanggal() {
+			var tanggal = document.getElementById("tanggal").value;
+			var data = localStorage.getItem("history");
+			if (!data) {
+				data = [];
+			} else {
+				data = JSON.parse(data);
+			}
+			data.push(tanggal);
+			localStorage.setItem("history", JSON.stringify(data));
+			tampilkanHistory();
+		}
+
+		// Fungsi untuk menampilkan history tanggal dari localStorage
+		function tampilkanHistory() {
+			var data = localStorage.getItem("history");
+			if (!data) {
+				return;
+			}
+			data = JSON.parse(data);
+			var historyElement = document.getElementById("history");
+			historyElement.innerHTML = "";
+			for (var i = 0; i < data.length; i++) {
+				historyElement.innerHTML += "<p>" + data[i] + "</p>";
+			}
+		}
+
+		tampilkanHistory();
+	</script>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -276,8 +292,58 @@
     <script src="/static/assets/lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="/static/assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
 
+    <!-- Page level plugins -->
+    <script src="/static/assets/lib/dataTables/jquery.dataTables.min.js"></script>
+    <script src="/static/assets/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+
+
     <!-- Template Javascript -->
     <script src="/static/assets/js/main.js"></script>
+    <script>
+    getData();
+    async function getData() {
+        const response = await fetch('http://127.0.0.1:5000/json-chart');
+        const data = await response.json();
+        console.log(data);
+        length = data.data.length;
+        console.log(length);
+        labels = [];
+        temperature = [];
+        humidity = [];
+
+        for (i = 0; i < length; i++) {
+            labels.push(data.data[i].tanggal);
+            temperature.push(data.data[i].temp);
+            humidity.push(data.data[i].hum);
+        }
+        new Chart($("#monitoring-chart").get(0).getContext("2d"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                    label: "temp",
+                    data: temperature,
+                    backgroundColor: "rgba(255, 0, 0, .8)",
+                    fill: false,
+                    },
+                    {
+                    label: "hum",
+                    data: humidity,
+                    backgroundColor: "rgba(0, 156, 255, .5)",
+                    fill: false,
+                    },
+
+                ],
+            },
+            options: {
+            responsive: true,
+            },
+        });
+    }
+    </script>
+
+
 </body>
 
 </html>
