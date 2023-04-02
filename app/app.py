@@ -86,6 +86,16 @@ def coba():
 
     return render_template('coba.html')
 
+#Mengambil data untuk table
+@app.route('/json-table', methods=['GET'])
+def table_chart():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM suhu")
+    r = [dict((cur.description[i][0], value)
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+    return jsonify({'data' : r})
+
+
 #Mengambil data untuk grafik
 @app.route('/json-chart', methods=['GET'])
 def x_chart():

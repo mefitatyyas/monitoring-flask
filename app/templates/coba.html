@@ -218,36 +218,25 @@
         });
     </script>
 
-    <!--Jquery Ajax Table-->
-    <script>
-        $(document).ready(function() {
-            // Perbarui data setiap detik
-            setInterval(function() {
-                $.ajax({
-                    url: '/datat',
-                    success: function(response) {
-                        var data = JSON.parse(response);
-                        $('#dataTable tbody').empty();
-                        for (var i = 0; i < data.length; i++) {
-                            var t = $('<tr>');
-                            t.append($('<td>').text(data[i].id));
-                            t.append($('<td>').text(data[i].tanggal));
-                            t.append($('<td>').text(data[i].temp));
-                            t.append($('<td>').text(data[i].hum));
-                            t.append($('<td>').text(data[i].status));
-                            $('#dataTable tbody').append(t);
-                        }
-                    }
-                });
-            }, 1000);
-        });
-    </script>
 
     <!-- Page level custom scripts -->
     <script>
         $(document).ready(function() {
-            $('#dataTable').DataTable();
+            var tableajax = $('#dataTable').DataTable({
+                'ajax' : '/json-table',
+                'columns' : [
+                    {'data': 'id'},
+                    {'data': 'tanggal'},
+                    {'data': 'temp'},
+                    {'data': 'hum'},
+                    {'data': 'status'}
+                ]
+            });
+            setInterval( function () {
+                tableajax.ajax.reload( null, false ); // user paging is not reset on reload
+            }, 1000 );
         });
+        
     </script>
 
     <script>
