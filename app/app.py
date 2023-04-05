@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 import paho.mqtt.client as mqtt_client
 import json
 import requests
+import datetime
 
 # Config
 app = Flask(__name__)
@@ -83,29 +84,78 @@ def datat():
 
 @app.route('/coba')
 def coba(): 
-
     return render_template('coba.html')
 
 #Mengambil data untuk table
-@app.route('/json-table', methods=['GET'])
-def table_chart():
+@app.route('/jsontable', methods=['GET'])
+def tablechart():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM suhu")
-    r = [dict((cur.description[i][0], value)
-                for i, value in enumerate(row)) for row in cur.fetchall()]
-    return jsonify({'data' : r})
+    cur.execute(f"SELECT * FROM suhu ORDER BY id DESC LIMIT 100")
+    tabel = cur.fetchall()
+    data = []
+    for t in tabel:
+        data.append({'id': t[0], 'tanggal': str(t[1]), 'temp': t[2], 'hum': t[3], 'status': t[4] })
+    return jsonify({'data':data})
 
+@app.route('/json-table/<tanggal>', methods=['GET'])
+def table(tanggal):
+    cur = mysql.connection.cursor()
+    cur.execute(f"SELECT * FROM suhu where DATE(tanggal) = '{tanggal}' ORDER BY id DESC LIMIT 100")
+    row_headers=[x[0] for x in cur.description] #this will extract row headers
+    rv = cur.fetchall()
+    json_data=[]
+    f = '%Y-%m-%d %H:%M:%S'
+    for result in rv:
+            lst = list(result)
+            lst[1] = result[1].strftime(f)
+            result = tuple(lst)
+            json_data.append(dict(zip(row_headers,result)))
+    return json.dumps({'data' : json_data})
+    
+@app.route('/apihistory/<start>/<end>', methods=['GET'])
+def history(start,end):
+    cur = mysql.connection.cursor()
+    cur.execute(f"SELECT * FROM suhu where tanggal BETWEEN '{start}' and '{end}'")
+    row_headers=[x[0] for x in cur.description] #this will extract row headers
+    rv = cur.fetchall()
+    json_data=[]
+    f = '%Y-%m-%d %H:%M:%S'
+    for result in rv:
+            lst = list(result)
+            lst[1] = result[1].strftime(f)
+            result = tuple(lst)
+            json_data.append(dict(zip(row_headers,result)))
+    return json.dumps({'data' : json_data})
+
+@app.route('/history/<start>/<end>', methods=['GET'])
+def datahistory(start,end):
+    
+   return render_template('history.html')
+                
 
 #Mengambil data untuk grafik
 @app.route('/json-chart', methods=['GET'])
 def x_chart():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM suhu")
+    cur.execute(f"SELECT * FROM suhu ORDER BY id DESC LIMIT 100")
     r = [dict((cur.description[i][0], value)
                 for i, value in enumerate(row)) for row in cur.fetchall()]
     return jsonify({'data' : r})
-    # chart_data = jsonify({'myCollection' : r})
-    # return render_template('xchart.html'),jsonify({'myCollection' : r})
+
+@app.route('/history_chart/<start>/<end>', methods=['GET'])
+def history_chart(start,end):
+    cur = mysql.connection.cursor()
+    cur.execute(f"SELECT * FROM suhu where tanggal BETWEEN '{start}' and '{end}'")
+    row_headers=[x[0] for x in cur.description] #this will extract row headers
+    rv = cur.fetchall()
+    json_data=[]
+    f = '%Y-%m-%d %H:%M:%S'
+    for result in rv:
+            lst = list(result)
+            lst[1] = result[1].strftime(f)
+            result = tuple(lst)
+            json_data.append(dict(zip(row_headers,result)))
+    return json.dumps({'data' : json_data})
 
 @app.route('/example', methods=['GET']) 
 def example():

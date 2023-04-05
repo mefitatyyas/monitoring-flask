@@ -29,6 +29,9 @@
 
     <!-- Template Stylesheet -->
     <link href="/static/assets/css/style.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/static/assets/lib/dataTables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -92,63 +95,54 @@
                 </div>
             </nav>
             <!-- Navbar End -->
-            <!-- About Start -->
-            <div id="about" class="about section">
-                <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                    <div class="row">
-                        <div class="col-lg-6">
-                        <div class="about-left-image  wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.5s">
-                            <img src="../static/assets/img/susandae.jpeg" width="450x">
-                        </div>
-                        </div>
-                        <div class="col-lg-6 align-self-center  wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.5s">
-                        <div class="about-right-content">
-                            <div class="section-heading">
-                            <h4>What is <em>Sistover?</em></h4>
-                            <h5><em>Sistover is Sistem Monitoring Suhu Ruangan Server</em></h5>
-                            <div class="line-dec"></div>
-                            <p>This system is used to measure, monitor, and report the temperature and humidity in a website-based server room. This device functions to ensure that the temperature and humidity in the server room remain within a safe range, which is at a temperature of 15°C-20°C degrees and humidity of 40% - 55%. This tool also aims to prevent damage to computer hardware.</p>
-                            <p>The monitoring device consists of a temperature sensor, DHT22, ESP8266 as a microcontroller, LCD to display temperature, humidity, status, and a website to monitor the sensor data results, and can send alerts if the temperature reaches an unsafe level.</p>
-                            </div>
-                            </div> 
-                        </div>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-            <!-- About End -->
 
-            <!-- About Start -->
-            <div id="about" class="about section">
-                <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                    <div class="row">
-                        <div class="col-lg-6">
-                        <div class="about-left-image  wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.5s">
-                            <img src="../static/assets/img/sistorgenset.jpeg" width="475x">
-                        </div>
-                        </div>
-                        <div class="col-lg-6 align-self-center  wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.5s">
-                        <div class="about-right-content">
-                            <div class="section-heading">
-                            <h4>What is <em>Sistem Monitoring Genset?</em></h4>
-                            <div class="line-dec"></div>
-                            <p>The system used to monitor, take pictures of the generator measuring pump, and report the voltage on the generator battery based on website. This monitoring tool consists of a voltage sensor or ina219, ESP8266 to accommodate data from the voltage sensor, esp32cam to take pictures of the generator measuring pump, and a website to monitor the results of images and voltage data. </p>
+            <!--Temperature & Humidity  Chart Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-sm-12 col-xl-12">
+                        <div class="bg-light text-center rounded p-4">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h6 class="mb-0">Temperature & Humidity</h6>
                             </div>
-                            </div> 
-                        </div>
+                            <canvas id="monitoring-chart"></canvas>
                         </div>
                     </div>
-                    </div>
-                </div>
                 </div>
             </div>
-            <!-- About End -->
+            <!-- Temperature & Humidity Chart End -->
+
+
+            <!-- Data table Start -->
+            <div class="container-fluid pt-4 px-4 pb-4">
+                <!-- DataTales Example  -->
+                <div class="card">
+                    <div class="bg-light text-center rounded p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h6 class="mb-0">SISTEM MONITORING SUHU RUANGAN SERVER</h6>
+                    </div></div>
+                    <div class="card-body bg-light">
+                        <div class="table-responsive">
+                            <table id="dataTable" class="table text-center" style="width:100%" >
+                                <thead class="text-center">
+                                    <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Temperature</th>
+                                        <th scope="col">Humadity</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Data table End -->
+            
+
 
             <!-- Footer Start -->
             <div class="container-fluid pt-4 px-4">
@@ -161,13 +155,60 @@
                 </div>
             </div>
             <!-- Footer End -->
-        </div>
+        
         <!-- Content End -->
 
 
         <!-- Back to Top -->
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
+
+    <!--Jquery Ajax Dashboard-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Perbarui data setiap detik
+            setInterval(function() {
+                $.ajax({
+                    url: '/data',
+                    success: function(response) {
+                        var data = JSON.parse(response);
+                        $('#temp').text(data.temp);
+                        $('#hum').text(data.hum);
+                        $('#getstatus').text(data.getstatus);
+                    }
+                });
+            }, 1000);
+        });
+    </script>
+    <script>
+        var pathArray = window.location.pathname.split('/');
+        $(document).ready(function() {
+            var tableajax = $('#dataTable').DataTable({
+                'ajax' : `/apihistory/${pathArray[2]}/${pathArray[3]}`,
+                'columns' : [
+                    {'data': 'id'},
+                    {'data': 'tanggal'},
+                    {'data': 'temp'},
+                    {'data': 'hum'},
+                    {'data': 'status'}
+                ]
+            });
+            setInterval( function () {
+                tableajax.ajax.reload( null, false ); // user paging is not reset on reload
+            }, 10000 );
+        });
+        
+    </script>
+
+    <script>
+			selectElement = document.getElementById("tanggal");
+            selectElement.addEventListener("change", function(event){
+                textContent = ${event.target.value};
+                
+            });
+
+    </script>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -180,8 +221,58 @@
     <script src="/static/assets/lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="/static/assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
 
+    <!-- Page level plugins -->
+    <script src="/static/assets/lib/dataTables/jquery.dataTables.min.js"></script>
+    <script src="/static/assets/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+
+
     <!-- Template Javascript -->
     <script src="/static/assets/js/main.js"></script>
+    <script>
+    getData();
+    async function getData() {
+        const response = await fetch(`/history_chart/${pathArray[2]}/${pathArray[3]}`);
+        const data = await response.json();
+        console.log(data);
+        length = data.data.length;
+        console.log(length);
+        labels = [];
+        temperature = [];
+        humidity = [];
+
+        for (i = 0; i < length; i++) {
+            labels.push(data.data[i].tanggal);
+            temperature.push(data.data[i].temp);
+            humidity.push(data.data[i].hum);
+        }
+        new Chart($("#monitoring-chart").get(0).getContext("2d"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                    label: "temp",
+                    data: temperature,
+                    backgroundColor: "rgba(255, 0, 0, .8)",
+                    fill: false,
+                    },
+                    {
+                    label: "hum",
+                    data: humidity,
+                    backgroundColor: "rgba(0, 156, 255, .5)",
+                    fill: false,
+                    },
+
+                ],
+            },
+            options: {
+            responsive: true,
+            },
+        });
+    }
+    </script>
+
+
 </body>
 
 </html>

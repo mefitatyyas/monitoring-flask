@@ -69,7 +69,7 @@
                             <a href="dashgenset" class="dropdown-item">Genset</a>
                         </div>
                     </div>
-                    <a href="about.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>About</a>
+                    <a href="about" class="nav-item nav-link"><i class="fa fa-th me-2"></i>About</a>
                         </div>
                     </div>
                 </div>
@@ -139,8 +139,6 @@
                                 <h6 class="mb-0">Temperature & Humidity</h6>
                             </div>
                             <canvas id="monitoring-chart"></canvas>
-	                        <label for="tanggal">Pilih Tanggal:</label>
-	                    <input type="date" id="tanggal" name="tanggal">
                         </div>
                     </div>
                 </div>
@@ -217,13 +215,11 @@
             }, 1000);
         });
     </script>
-
-
-    <!-- Page level custom scripts -->
     <script>
+        var pathArray = window.location.pathname.split('/');
         $(document).ready(function() {
             var tableajax = $('#dataTable').DataTable({
-                'ajax' : '/json-table',
+                'ajax' : '/jsontable',
                 'columns' : [
                     {'data': 'id'},
                     {'data': 'tanggal'},
@@ -234,42 +230,19 @@
             });
             setInterval( function () {
                 tableajax.ajax.reload( null, false ); // user paging is not reset on reload
-            }, 1000 );
+            }, 10000 );
         });
         
     </script>
 
     <script>
-		// Fungsi untuk menyimpan tanggal ke localStorage
-		function simpanTanggal() {
-			var tanggal = document.getElementById("tanggal").value;
-			var data = localStorage.getItem("history");
-			if (!data) {
-				data = [];
-			} else {
-				data = JSON.parse(data);
-			}
-			data.push(tanggal);
-			localStorage.setItem("history", JSON.stringify(data));
-			tampilkanHistory();
-		}
+			selectElement = document.getElementById("tanggal");
+            selectElement.addEventListener("change", function(event){
+                textContent = ${event.target.value};
+                
+            });
 
-		// Fungsi untuk menampilkan history tanggal dari localStorage
-		function tampilkanHistory() {
-			var data = localStorage.getItem("history");
-			if (!data) {
-				return;
-			}
-			data = JSON.parse(data);
-			var historyElement = document.getElementById("history");
-			historyElement.innerHTML = "";
-			for (var i = 0; i < data.length; i++) {
-				historyElement.innerHTML += "<p>" + data[i] + "</p>";
-			}
-		}
-
-		tampilkanHistory();
-	</script>
+    </script>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

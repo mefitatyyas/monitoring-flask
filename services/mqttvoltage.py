@@ -10,7 +10,7 @@ client.connect(broker, port)
 client.subscribe(topic)
 
 def on_message(client, userdata, message):
-    # print(message.topic+" "+str(message.payload))
+    print(message.topic+" "+str(message.payload))
     data = message.payload.decode('utf-8')
     volt = data.split(',')
     volt = ','.join(volt)

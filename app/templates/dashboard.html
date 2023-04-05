@@ -29,6 +29,9 @@
 
     <!-- Template Stylesheet -->
     <link href="/static/assets/css/style.css" rel="stylesheet">
+
+    <!-- Custom styles for this page -->
+    <link href="/static/assets/lib/dataTables/dataTables.bootstrap4.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -144,30 +147,35 @@
 
 
             <!-- Data table Start -->
-            <div class="container-fluid pt-4 px-4">
-                <div class="bg-light text-center rounded p-4">
+            <div class="container-fluid pt-4 px-4 pb-4">
+                <!-- DataTales Example  -->
+                <div class="card">
+                    <div class="bg-light text-center rounded p-4">
                     <div class="d-flex align-items-center justify-content-between mb-4">
                         <h6 class="mb-0">SISTEM MONITORING SUHU RUANGAN SERVER</h6>
-
-                    </div>
-                    <div class="table-responsive">
-                        <table  id="data-table" class="table text-start align-middle table-bordered table-hover mb-0" >
-                            <thead>
-                                <tr class="text-dark">
-                                    <th scope="col">No</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Temperature</th>
-                                    <th scope="col">Humadity</th>
-                                    <th scope="col">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                        </table>
+                    </div></div>
+                    <div class="card-body bg-light">
+                        <div class="table-responsive">
+                            <table id="dataTable" class="table text-center" style="width:100%" >
+                                <thead class="text-center">
+                                    <tr>
+                                        <th scope="col">No</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Temperature</th>
+                                        <th scope="col">Humadity</th>
+                                        <th scope="col">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
+        
             <!-- Data table End -->
+            
 
 
             <!-- Footer Start -->
@@ -181,7 +189,7 @@
                 </div>
             </div>
             <!-- Footer End -->
-        </div>
+        
         <!-- Content End -->
 
 
@@ -207,33 +215,34 @@
             }, 1000);
         });
     </script>
-
-    <!--Jquery Ajax Table-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+        var pathArray = window.location.pathname.split('/');
         $(document).ready(function() {
-            // Perbarui data setiap detik
-            setInterval(function() {
-                $.ajax({
-                    url: '/datat',
-                    success: function(response) {
-                        var data = JSON.parse(response);
-                        $('#data-table tbody').empty();
-                        for (var i = 0; i < data.length; i++) {
-                            var t = $('<tr>');
-                            t.append($('<td>').text(data[i].id));
-                            t.append($('<td>').text(data[i].tanggal));
-                            t.append($('<td>').text(data[i].temp));
-                            t.append($('<td>').text(data[i].hum));
-                            t.append($('<td>').text(data[i].status));
-                            $('#data-table tbody').append(t);
-                        }
-                    }
-                });
-            }, 1000);
+            var tableajax = $('#dataTable').DataTable({
+                'ajax' : `/json-table/${pathArray[2]}`,
+                'columns' : [
+                    {'data': 'id'},
+                    {'data': 'tanggal'},
+                    {'data': 'temp'},
+                    {'data': 'hum'},
+                    {'data': 'status'}
+                ]
+            });
+            setInterval( function () {
+                tableajax.ajax.reload( null, false ); // user paging is not reset on reload
+            }, 10000 );
         });
+        
     </script>
 
+    <script>
+			selectElement = document.getElementById("tanggal");
+            selectElement.addEventListener("change", function(event){
+                textContent = ${event.target.value};
+                
+            });
+
+    </script>
 
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
@@ -245,6 +254,11 @@
     <script src="/static/assets/lib/tempusdominus/js/moment.min.js"></script>
     <script src="/static/assets/lib/tempusdominus/js/moment-timezone.min.js"></script>
     <script src="/static/assets/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="/static/assets/lib/dataTables/jquery.dataTables.min.js"></script>
+    <script src="/static/assets/lib/dataTables/dataTables.bootstrap4.min.js"></script>
+
 
     <!-- Template Javascript -->
     <script src="/static/assets/js/main.js"></script>
