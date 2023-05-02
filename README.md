@@ -5,7 +5,13 @@
 - Clone repository
 
 ```
-git clone git@github.com:aldrichfcmw/monitoring-flask.git
+git clone https://github.com/mefitatyyas/monitoring-flask.git
+```
+
+- Instal Requirement 
+
+```
+$ pip install -r requirements.txt
 ```
 
 ### Push Github
