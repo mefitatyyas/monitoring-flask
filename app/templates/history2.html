@@ -66,6 +66,7 @@
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Dashboard</a>
                         <div class="dropdown-menu bg-transparent border-0">
                             <a href="dash" class="dropdown-item">Suhu Ruangan Server</a>
+                            <a href="dash2" class="dropdown-item">Suhu Ruangan Radar</a>
                             <a href="dashgenset" class="dropdown-item">Genset</a>
                         </div>
                     </div>
@@ -96,40 +97,6 @@
             </nav>
             <!-- Navbar End -->
 
-            <!-- Dashboard Start -->
-            <div class="container-fluid pt-4 px-4">
-                <div class="row g-3">
-                    <div class="col-sm-6 col-xl-4">
-                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/temp.png" width="80px">
-                            <div class="ms-3">
-                                <p class="mb-2">Temperature</p>
-                                <h6 class="mb-0"><span id="temp"></span> &#8451;</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-xl-4">
-                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/hum.png" width="80px">
-                            <div class="ms-3">
-                                <p class="mb-2">Humidity</p>
-                                <h6 class="mb-0"><span id="hum"></span> &#37;</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-xl-4">
-                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
-                            <img src="../static/assets/img/info.png" width="80px">
-                            <div class="ms-3">
-                                <p class="mb-2">Status</p>
-                                <h6 class="mb-0"><span id="getstatus"></span></h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Dashboard End -->
-
             <!--Temperature & Humidity  Chart Start -->
             <div class="container-fluid pt-4 px-4">
                 <div class="row g-4">
@@ -138,7 +105,7 @@
                             <div class="d-flex align-items-center justify-content-between mb-4">
                                 <h6 class="mb-0">Temperature & Humidity</h6>
                             </div>
-                            <canvas id="monitoring-chart"></canvas>
+                            <canvas id="radar-chart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -197,32 +164,15 @@
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
 
-    <!--Jquery Ajax Dashboard-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Perbarui data setiap detik
-            setInterval(function() {
-                $.ajax({
-                    url: '/data',
-                    success: function(response) {
-                        var data = JSON.parse(response);
-                        $('#temp').text(data.temp);
-                        $('#hum').text(data.hum);
-                        $('#getstatus').text(data.getstatus);
-                    }
-                });
-            }, 1000);
-        });
-    </script>
+    <!--Jquery Ajax Table-->
     <script>
         var pathArray = window.location.pathname.split('/');
         $(document).ready(function() {
             var tableajax = $('#dataTable').DataTable({
-                'ajax' : '/jsontable',
+                'ajax' : `/apihistory2/${pathArray[2]}/${pathArray[3]}`,
                 'columns' : [
                     {'data': 'id'},
-                    {'data': 'tanggal'},
+                    {'data': 'date'},
                     {'data': 'temp'},
                     {'data': 'hum'},
                     {'data': 'status'}
@@ -236,7 +186,7 @@
     </script>
 
     <script>
-			selectElement = document.getElementById("tanggal");
+			selectElement = document.getElementById("date");
             selectElement.addEventListener("change", function(event){
                 textContent = ${event.target.value};
                 
@@ -265,7 +215,7 @@
     <script>
     getData();
     async function getData() {
-        const response = await fetch('http://127.0.0.1:5000/json-chart');
+        const response = await fetch(`/history_chart2/${pathArray[2]}/${pathArray[3]}`);
         const data = await response.json();
         console.log(data);
         length = data.data.length;
@@ -275,11 +225,11 @@
         humidity = [];
 
         for (i = 0; i < length; i++) {
-            labels.push(data.data[i].tanggal);
+            labels.push(data.data[i].date);
             temperature.push(data.data[i].temp);
             humidity.push(data.data[i].hum);
         }
-        new Chart($("#monitoring-chart").get(0).getContext("2d"), {
+        new Chart($("#radar-chart").get(0).getContext("2d"), {
             type: "line",
             data: {
                 labels: labels,

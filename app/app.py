@@ -12,33 +12,27 @@ app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'projek1'
 mysql = MySQL(app)
-
-def sendMsg(msg):
-    url = 'https://app.whacenter.com/api/send'
-    files = {
-        "number" :"081358522935",
-        'message': msg,
-        'device_id' : '2d1957b59eee663a75eacff834f2fc33',
-        }
-    x = requests.post(url, data=files)
-    print(x.text)
     
+#Memanggil about
 @app.route('/about', methods=['GET'])  
 def index():
     
     return render_template('about.html')
 
-#Mengambil data
-@app.route('/dash', methods=['GET'])
-def dashboard(): 
+#Ruangan Server 1
+#Mengirim data ke database
+@app.route('/insert/<temp>/<hum>/<getstatus>', methods=['GET'])
+def insert(temp,hum,getstatus):
+    temp = float(temp)
+    hum = float(hum)
+    getstatus = str(getstatus)
     cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM suhu')
-    data = cur.fetchall()
-    cur2 = mysql.connection.cursor()
-    cur2.execute('SELECT * FROM suhu ORDER BY id DESC LIMIT 1')
-    temp = cur2.fetchone()
-    return render_template('dashboard.html', data=data, temp=temp)
+    cur.execute(f"INSERT INTO suhu (temp, hum, status) VALUES ({temp}, {hum},'{getstatus}')")
+    mysql.connection.commit()
+    cur.close()
+    return 'Data berhasil ditambahkan'
 
+#Mengambil data untuk dashboard
 @app.route('/dataa', methods=['GET'])
 def dataa(): 
     cur2 = mysql.connection.cursor()
@@ -46,25 +40,12 @@ def dataa():
     data = cur2.fetchone()
     return data
 
-@app.route('/datatabel', methods=['GET'])
-def datatabel(): 
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM suhu')
-    tabel = cur.fetchall()
-    return tabel
-
 # Fungsi untuk mengubah data dashboard dalam format JSON
 def to_json(temp, hum, getstatus):
     data = {'temp': temp, 'hum': hum, 'getstatus': getstatus}
     return json.dumps(data)
 
-# Fungsi untuk mengubah data tabel dalam format JSON
-def to_json_tabel(tabel):
-    data = []
-    for t in tabel:
-        data.append({'id': t[0], 'tanggal': str(t[1]), 'temp': t[2], 'hum': t[3], 'status': t[4] })
-    return json.dumps(data)
-
+# Fungsi untuk mengirim data ke dashboard
 @app.route('/data', methods=['GET'])
 def data():
     # Kirim data suhu dan kelembaban dari database MySQL ke halaman website
@@ -74,17 +55,6 @@ def data():
     getstatus = data[4]
     data = to_json(temp, hum, getstatus)
     return data
-
-@app.route('/datat', methods=['GET'])
-def datat():
-    # Kirim data suhu dan kelembaban dari database MySQL ke halaman website
-    tabel = datatabel()
-    data = to_json_tabel(tabel)
-    return data
-
-@app.route('/coba')
-def coba(): 
-    return render_template('coba.html')
 
 #Mengambil data untuk table
 @app.route('/jsontable', methods=['GET'])
@@ -97,23 +67,20 @@ def tablechart():
         data.append({'id': t[0], 'tanggal': str(t[1]), 'temp': t[2], 'hum': t[3], 'status': t[4] })
     return jsonify({'data':data})
 
-@app.route('/json-table/<tanggal>', methods=['GET'])
-def table(tanggal):
+#Mengambil data untuk grafik
+@app.route('/json-chart', methods=['GET'])
+def x_chart():
     cur = mysql.connection.cursor()
-    cur.execute(f"SELECT * FROM suhu where DATE(tanggal) = '{tanggal}' ORDER BY id DESC LIMIT 100")
-    row_headers=[x[0] for x in cur.description] #this will extract row headers
-    rv = cur.fetchall()
-    json_data=[]
-    f = '%Y-%m-%d %H:%M:%S'
-    for result in rv:
-            lst = list(result)
-            lst[1] = result[1].strftime(f)
-            result = tuple(lst)
-            json_data.append(dict(zip(row_headers,result)))
-    return json.dumps({'data' : json_data})
-    
+    cur.execute(f"SELECT * FROM suhu ORDER BY id DESC LIMIT 100")
+    tabel = cur.fetchall()
+    data = []
+    for t in tabel:
+        data.append({'id': t[0], 'tanggal': str(t[1]), 'temp': t[2], 'hum': t[3], 'status': t[4] })
+    return jsonify({'data':data})
+
+# Fungsi untuk memanggil history data
 @app.route('/apihistory/<start>/<end>', methods=['GET'])
-def history(start,end):
+def history(start,end):   
     cur = mysql.connection.cursor()
     cur.execute(f"SELECT * FROM suhu where tanggal BETWEEN '{start}' and '{end}'")
     row_headers=[x[0] for x in cur.description] #this will extract row headers
@@ -127,21 +94,7 @@ def history(start,end):
             json_data.append(dict(zip(row_headers,result)))
     return json.dumps({'data' : json_data})
 
-@app.route('/history/<start>/<end>', methods=['GET'])
-def datahistory(start,end):
-    
-   return render_template('history.html')
-                
-
-#Mengambil data untuk grafik
-@app.route('/json-chart', methods=['GET'])
-def x_chart():
-    cur = mysql.connection.cursor()
-    cur.execute(f"SELECT * FROM suhu ORDER BY id DESC LIMIT 100")
-    r = [dict((cur.description[i][0], value)
-                for i, value in enumerate(row)) for row in cur.fetchall()]
-    return jsonify({'data' : r})
-
+# Fungsi untuk memanggil history data
 @app.route('/history_chart/<start>/<end>', methods=['GET'])
 def history_chart(start,end):
     cur = mysql.connection.cursor()
@@ -157,26 +110,154 @@ def history_chart(start,end):
             json_data.append(dict(zip(row_headers,result)))
     return json.dumps({'data' : json_data})
 
-@app.route('/example', methods=['GET']) 
-def example():
-    return render_template('example.html')
 
+#Mengirim notifikasi WA
+def sendMsg(msg):
+    url = 'https://app.whacenter.com/api/send'
+    files = {
+        "number" :"081358522935",
+        'message': msg,
+        'device_id' : '2d1957b59eee663a75eacff834f2fc33',
+        }
+    x = requests.post(url, data=files)
+    print(x.text)
+    
+# Fungsi untuk mengirim pesan
 @app.route('/send', methods=['GET']) 
 def sendWa():
     sendMsg("ok")
     return "ok"
 
+#Memanggil dahsboard
+@app.route('/dash', methods=['GET'])
+def dashboard(): 
+    
+    return render_template('dashboard.html')
+
+@app.route('/history/<start>/<end>', methods=['GET'])
+def datahistory(start,end):
+    
+   return render_template('history.html')
+
+#Ruangan Server 2
 #Mengirim data ke database
-@app.route('/insert/<temp>/<hum>/<getstatus>', methods=['GET'])
-def insert(temp,hum,getstatus):
+@app.route('/insert2/<temp>/<hum>/<getstatus>', methods=['GET'])
+def insert2(temp,hum,getstatus):
     temp = float(temp)
     hum = float(hum)
     getstatus = str(getstatus)
     cur = mysql.connection.cursor()
-    cur.execute(f"INSERT INTO suhu (temp, hum, status) VALUES ({temp}, {hum},'{getstatus}')")
+    cur.execute(f"INSERT INTO radar (temp, hum, status) VALUES ({temp}, {hum},'{getstatus}')")
     mysql.connection.commit()
     cur.close()
     return 'Data berhasil ditambahkan'
+
+#Mengambil data untuk dashboard
+@app.route('/dataa2', methods=['GET'])
+def dataa2(): 
+    cur2 = mysql.connection.cursor()
+    cur2.execute('SELECT * FROM radar ORDER BY id DESC LIMIT 1')
+    data = cur2.fetchone()
+    return data
+
+# Fungsi untuk mengubah data dashboard dalam format JSON
+def to_json2(temp, hum, getstatus):
+    data = {'temp': temp, 'hum': hum, 'getstatus': getstatus}
+    return json.dumps(data)
+
+# Fungsi untuk mengirim data ke dashboard
+@app.route('/data2', methods=['GET'])
+def data2():
+    # Kirim data suhu dan kelembaban dari database MySQL ke halaman website
+    data = dataa2()
+    temp = data[2]
+    hum = data[3]
+    getstatus = data[4]
+    data = to_json2(temp, hum, getstatus)
+    return data
+
+#Mengambil data untuk table
+@app.route('/jsontable2', methods=['GET'])
+def tablechart2():
+    cur = mysql.connection.cursor()
+    cur.execute(f"SELECT * FROM radar ORDER BY id DESC LIMIT 100")
+    tabel = cur.fetchall()
+    data = []
+    for t in tabel:
+        data.append({'id': t[0], 'date': str(t[1]), 'temp': t[2], 'hum': t[3], 'status': t[4] })
+    return jsonify({'data':data})
+
+#Mengambil data untuk grafik
+@app.route('/json-chart2', methods=['GET'])
+def x_chart2():
+    cur = mysql.connection.cursor()
+    cur.execute(f"SELECT * FROM radar ORDER BY id DESC LIMIT 100")
+    tabel = cur.fetchall()
+    data = []
+    for t in tabel:
+        data.append({'id': t[0], 'date': str(t[1]), 'temp': t[2], 'hum': t[3], 'status': t[4] })
+    return jsonify({'data':data})
+
+# Fungsi untuk memanggil history data
+@app.route('/apihistory2/<start>/<end>', methods=['GET'])
+def history2(start,end):   
+    cur = mysql.connection.cursor()
+    cur.execute(f"SELECT * FROM radar where date BETWEEN '{start}' and '{end}'")
+    row_headers=[x[0] for x in cur.description] #this will extract row headers
+    rv = cur.fetchall()
+    json_data=[]
+    f = '%Y-%m-%d %H:%M:%S'
+    for result in rv:
+            lst = list(result)
+            lst[1] = result[1].strftime(f)
+            result = tuple(lst)
+            json_data.append(dict(zip(row_headers,result)))
+    return json.dumps({'data' : json_data})
+
+# Fungsi untuk memanggil history data
+@app.route('/history_chart2/<start>/<end>', methods=['GET'])
+def history_chart2(start,end):
+    cur = mysql.connection.cursor()
+    cur.execute(f"SELECT * FROM radar where date BETWEEN '{start}' and '{end}'")
+    row_headers=[x[0] for x in cur.description] #this will extract row headers
+    rv = cur.fetchall()
+    json_data=[]
+    f = '%Y-%m-%d %H:%M:%S'
+    for result in rv:
+            lst = list(result)
+            lst[1] = result[1].strftime(f)
+            result = tuple(lst)
+            json_data.append(dict(zip(row_headers,result)))
+    return json.dumps({'data' : json_data})
+
+#Mengirim notifikasi WA
+def sendMsg2(message):
+    url = 'https://app.whacenter.com/api/send'
+    files = {
+        "number" :"081358522935",
+        'message': message,
+        'device_id' : '2d1957b59eee663a75eacff834f2fc33',
+        }
+    x = requests.post(url, data=files)
+    print(x.text)
+    
+# Fungsi untuk mengirim pesan
+@app.route('/send2', methods=['GET']) 
+def sendWa2():
+    sendMsg2("ok")
+    return "ok"
+
+#Memanggil dahsboard
+@app.route('/dash2', methods=['GET'])
+def dashboard2(): 
+    
+    return render_template('dashboard2.html')
+
+@app.route('/history2/<start>/<end>', methods=['GET'])
+def datahistory2(start,end):
+    
+   return render_template('history2.html')
+
 
 # GENSET (mengirim data ke database)
 @app.route('/dashgenset', methods=['GET'])
@@ -323,6 +404,15 @@ def getFromCam():
 
     client.publish("bmkg/ambilcamera", "?ambilfoto")
     return 'Data Berhasil Ditambahkan'
+
+@app.route('/genset/camera2/get')
+def getFromCamera2():
+    client = mqtt_client.Client("bmkguser123")
+    client.connect('broker.emqx.io', 1883)
+
+    client.publish("bmkg/ambilcamera2", "?ambilfoto")
+    return 'Data Berhasil Ditambahkan'
+
 
 @app.route('/genset/camera/flash/<value>')
 def getFlashCam(value):

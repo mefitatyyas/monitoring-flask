@@ -66,6 +66,7 @@
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Dashboard</a>
                         <div class="dropdown-menu bg-transparent border-0">
                             <a href="dash" class="dropdown-item">Suhu Ruangan Server</a>
+                            <a href="dash2" class="dropdown-item">Suhu Ruangan Radar</a>
                             <a href="dashgenset" class="dropdown-item">Genset</a>
                         </div>
                     </div>
@@ -219,7 +220,7 @@
         var pathArray = window.location.pathname.split('/');
         $(document).ready(function() {
             var tableajax = $('#dataTable').DataTable({
-                'ajax' : `/json-table/${pathArray[2]}`,
+                'ajax' : '/jsontable',
                 'columns' : [
                     {'data': 'id'},
                     {'data': 'tanggal'},
